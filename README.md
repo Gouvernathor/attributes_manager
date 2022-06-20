@@ -4,7 +4,7 @@ A framework to help handling layeredimage attributes (and image attributes in ge
 The `attributes_manager.rpy` file contains the code itself.
 It contains classes whose exact features are documented in their docstrings.
 
-The `script.rpy` files contains an example as to how to use it with the assets of the `images/` folder,
+The `script.rpy` file *(TBD)* contains an example as to how to use it with the assets of the `images/` folder,
 as well as a comparison with how the same thing would be done vanilla-style.
 
 ## Terms of use

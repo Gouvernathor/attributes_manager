@@ -109,33 +109,26 @@ init python in attributes_manager:
                     rv.add(att)
             return rv
 
-        def _wrapper(func):
-            def internal(self, *args):
-                args = (type(self)(arg) for arg in args)
-                return type(self)(func(self, *args))
-            return internal
-        __sub__ = _wrapper(renpy.store.set.__sub__)
-        __isub__ = _wrapper(renpy.store.set.__isub__)
-        __rsub__ = _wrapper(renpy.store.set.__rsub__)
-        __xor__ = _wrapper(renpy.store.set.__xor__)
-        __ixor__ = _wrapper(renpy.store.set.__ixor__)
-        __rxor__ = _wrapper(renpy.store.set.__rxor__)
-        __and__ = _wrapper(renpy.store.set.__and__)
-        __iand__ = _wrapper(renpy.store.set.__iand__)
-        __rand__ = _wrapper(renpy.store.set.__rand__)
-        __or__ = _wrapper(renpy.store.set.__or__)
-        __ior__ = _wrapper(renpy.store.set.__ior__)
-        __ror__ = _wrapper(renpy.store.set.__ror__)
-        copy = _wrapper(renpy.store.set.copy)
-        difference = _wrapper(renpy.store.set.difference)
-        intersection = _wrapper(renpy.store.set.intersection)
-        symmetric_difference = _wrapper(renpy.store.set.symmetric_difference)
-        union = _wrapper(renpy.store.set.union)
-        del _wrapper
-
         def __repr__(self):
             return type(self).__module__ + "." + super().__repr__()
 
+init python hide:
+    """
+    Some little magic to make our set's inerited methods return objects of the proper type.
+    """
+    def _wrapper(func):
+        def internal(self, *args):
+            args = (type(self)(arg) for arg in args)
+            return type(self)(func(self, *args))
+        return internal
+    for methname in ("__sub__", "__isub__", "__rsub__",
+                     "__xor__", "__ixor__", "__rxor__",
+                     "__and__", "__iand__", "__rand__",
+                     "__or__", "__ior__", "__ror__",
+                     "copy", "difference", "intersection", "symmetric_difference", "union"):
+        setattr(attributes_manager.set, methname, _wrapper(getattr(renpy.store.set, methname)))
+
+init python in attributes_manager:
     class adjust_decorator(python_object):
         """
         This is a decorator for the declaration of adjust_attributes functions.

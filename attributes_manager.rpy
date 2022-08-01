@@ -46,7 +46,7 @@ init python in attributes_manager:
             return self[0] != '-'
 
         def __repr__(self):
-            return "attribute({})".format(super().__repr__(self))
+            return "attribute({})".format(super().__repr__())
 
     class set(renpy.store.set):
         __slots__ = ()

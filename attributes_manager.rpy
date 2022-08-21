@@ -110,23 +110,24 @@ init python in attributes_manager:
             return rv
 
         def __repr__(self):
-            return type(self).__module__ + "." + super().__repr__()
+            return __name__ + "." + super().__repr__()
 
 init python hide:
     """
     Some little magic to make our set's inerited methods return objects of the proper type.
     """
-    def _wrapper(func):
+    def _wrapper(func, typ):
         def internal(self, *args):
-            args = (type(self)(arg) for arg in args)
-            return type(self)(func(self, *args))
+            args = (typ(arg) for arg in args)
+            return typ(func(self, *args))
         return internal
     for methname in ("__sub__", "__isub__", "__rsub__",
                      "__xor__", "__ixor__", "__rxor__",
                      "__and__", "__iand__", "__rand__",
                      "__or__", "__ior__", "__ror__",
                      "copy", "difference", "intersection", "symmetric_difference", "union"):
-        setattr(attributes_manager.set, methname, _wrapper(getattr(renpy.store.set, methname)))
+        setattr(attributes_manager.set, methname, _wrapper(getattr(renpy.store.set, methname),
+                                                           attributes_manager.set))
 
 init python in attributes_manager:
     class adjust_decorator(python_object):

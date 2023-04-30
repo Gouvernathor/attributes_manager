@@ -138,7 +138,8 @@ class adjust_decorator(python_object):
 
     The function being decorated will be passed a single argument :
     an `attributes_manager.set` of `attributes_manager.attribute` objects.
-    This is guaranteed even when doing things the modular way - using several adjusters for the same image tag.
+    This is not guaranteed when doing things the modular way - using several adjusters for the same image tag,
+    one will receive the attributes as they were returned by the previous adjuster.
     The first attribute, which is the tag of the shown image, is not a part of the passed set.
     The function being decorated must return an iterable (set, list, tuple... attributes_manager.set)
     of string objects (or subclasses of string, such as attributes_manager.attribute).
@@ -147,7 +148,9 @@ class adjust_decorator(python_object):
     will be stored in `config.adjust_attributes[name]`.
     If no `name` parameter is passed, if the name of the function is "(something)_adjust_attributes",
     that `something` is taken as the name.
-    Otherwise, the decorator doesn't store the function anywhere.
+    Otherwise, the whole name of the function is taken as the name.
+
+    The function is returned as-is.
     """
 
     __slots__ = "name",

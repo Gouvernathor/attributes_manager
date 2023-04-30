@@ -203,3 +203,4 @@ class __adjuster_callable_list(list):
         return name[0], *(str(el) for el in aaa_set) # very important, only return native types !
 
 config.adjust_attributes = __defaultdict(__adjuster_callable_list)
+config.default_attribute_callbacks = __defaultdict(__adjuster_callable_list)

@@ -1,3 +1,6 @@
+import renpy
+from renpy import python_object, config
+
 """renpy
 init python in attributes_manager:
 """
@@ -115,10 +118,6 @@ class set(renpy.store.set):
     def __repr__(self):
         return __name__ + "." + super().__repr__()
 
-"""renpy
-init python hide:
-"""
-
 # Some little magic to make our set's inerited methods return objects of the proper type.
 def _wrapper(func, typ):
     def internal(self, *args):
@@ -130,12 +129,8 @@ for methname in ("__sub__", "__isub__", "__rsub__",
                  "__and__", "__iand__", "__rand__",
                  "__or__", "__ior__", "__ror__",
                  "copy", "difference", "intersection", "symmetric_difference", "union"):
-    setattr(attributes_manager.set, methname, _wrapper(getattr(renpy.store.set, methname),
-                                                       attributes_manager.set))
-
-"""renpy
-init python in attributes_manager:
-"""
+    setattr(set, methname, _wrapper(getattr(renpy.store.set, methname), set))
+del methname, _wrapper
 
 class adjust_decorator(python_object):
     """

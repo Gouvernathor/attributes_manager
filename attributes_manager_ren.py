@@ -138,7 +138,8 @@ class adjust_decorator(python_object):
 
     The function being decorated will be passed a single argument :
     an `attributes_manager.set` of `attributes_manager.attribute` objects.
-    The first attribute, which is the tag of the shown image, is not a part of the set.
+    This is guaranteed even when doing things the modular way - using several adjusters for the same image tag.
+    The first attribute, which is the tag of the shown image, is not a part of the passed set.
     The function being decorated must return an iterable (set, list, tuple... attributes_manager.set)
     of string objects (or subclasses of string, such as attributes_manager.attribute).
 
@@ -163,23 +164,9 @@ class adjust_decorator(python_object):
             raise TypeError("This must be used as a decorator directly, or called with no parameter, or called with a string.")
 
     def __call__(self, func):
-        funcname = self.name
-
-        def rf(name):
-            aaa_set = set(attribute(att) for att in name[1:])
-            rv = func(aaa_set)
-            rv = tuple(str(el) for el in rv) # very important, only return native types !
-            return name[0], *rv
-
-        if funcname is None:
-            sfx = self.suffix
-            if func.__name__.endswith(sfx):
-                funcname = func.__name__.removesuffix(sfx)
-
-        if funcname is not None:
-            self.store[funcname] = rf
-
-        return rf
+        funcname = self.name or func.__name__.removesuffix(self.suffix)
+        self.store[funcname].append(func)
+        return func
 
 class default_decorator(adjust_decorator):
     """
@@ -192,3 +179,24 @@ class default_decorator(adjust_decorator):
     __slots__ = ()
     suffix = "_default_attributes"
     store = renpy.store.config.default_attribute_callbacks
+
+"""renpy
+init -999 python:
+"""
+from collections import defaultdict as __defaultdict
+
+class __adjuster_callable_list(list):
+    """
+    A list that can be called.
+
+    When called, it recursively calls every element of the list in order, and returns the last result.
+    This call is wrapped in the argument-wrapping this module does.
+    """
+
+    def __call__(self, name):
+        aaa_set = attributes_manager.set(attributes_manager.attribute(att) for att in name[1:])
+        for func in self:
+            aaa_set = func(aaa_set)
+        return name[0], *(str(el) for el in aaa_set) # very important, only return native types !
+
+config.adjust_attributes = __defaultdict(__adjuster_callable_list)

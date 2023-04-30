@@ -149,12 +149,18 @@ class adjust_decorator(python_object):
     Otherwise, the decorator doesn't store the function anywhere.
     """
 
-    __slots__ = "name"
+    __slots__ = "name",
     suffix = "_adjust_attributes"
     store = renpy.store.config.adjust_attributes
 
-    def __init__(self, name=None):
-        self.name = name
+    def __init__(self, name=None, /):
+        if (name is None) or isinstance(name, str):
+            self.name = name
+        elif callable(name):
+            self.name = None
+            self(name)
+        else:
+            raise TypeError("This must be used as a decorator directly, or called with no parameter, or called with a string.")
 
     def __call__(self, func):
         funcname = self.name
@@ -163,7 +169,7 @@ class adjust_decorator(python_object):
             aaa_set = set(attribute(att) for att in name[1:])
             rv = func(aaa_set)
             rv = tuple(str(el) for el in rv) # very important, only return native types !
-            return (name[0],)+tuple(rv)
+            return name[0], *rv
 
         if funcname is None:
             sfx = self.suffix
@@ -172,6 +178,7 @@ class adjust_decorator(python_object):
 
         if funcname is not None:
             self.store[funcname] = rf
+
         return rf
 
 class default_decorator(adjust_decorator):

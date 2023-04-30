@@ -197,7 +197,7 @@ class __adjuster_callable_list(list):
     """
 
     def __call__(self, name):
-        aaa_set = attributes_manager.set(attributes_manager.attribute(att) for att in name[1:])
+        aaa_set = attributes_manager.set(name[1:])
         for func in self:
             aaa_set = func(aaa_set)
         return name[0], *(str(el) for el in aaa_set) # very important, only return native types !

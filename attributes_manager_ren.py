@@ -115,6 +115,16 @@ class set(renpy.store.set):
                 rv.add(att)
         return rv
 
+    def filter_added(self, added):
+        """
+        Returns a subset of each attribute with the given added-ness.
+        """
+        rv = type(self)()
+        for att in self:
+            if att.added == added:
+                rv.add(att)
+        return rv
+
     def __repr__(self):
         return __name__ + "." + super().__repr__()
 

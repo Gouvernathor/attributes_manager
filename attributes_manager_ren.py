@@ -176,7 +176,11 @@ class default_decorator(adjust_decorator):
     This is a decorator for the declaration of default_attribute_callbacks functions.
 
     It works the same as adjust_decorator, except that the store is config.default_attribute_callbacks,
-    and the recognized template is "(something)_default_attributes"
+    and the recognized template is "(something)_default_attributes".
+
+    When used in a modular way, the default adjusters are called in the order they were declared,
+    and the set being passed is always an attributes_manager.set, and contains the attributes initially
+    passed as well as all the attributes added by the previously called defaulters.
     """
 
     __slots__ = ()
@@ -202,5 +206,17 @@ class __adjuster_callable_list(list):
             aaa_set = func(aaa_set)
         return name[0], *(str(el) for el in aaa_set) # very important, only return native types !
 
+class __defaulter_callable_list(list):
+    """
+    Same, but adapted to the default case.
+    """
+
+    def __call__(self, name):
+        aaa_set = attributes_manager.set(name[1:])
+        rv = set()
+        for func in self:
+            rv.update(func(aaa_set|rv))
+        return name[0], *(str(el) for el in rv) # very important, only return native types !
+
 config.adjust_attributes = __defaultdict(__adjuster_callable_list)
-config.default_attribute_callbacks = __defaultdict(__adjuster_callable_list)
+config.default_attribute_callbacks = __defaultdict(__defaulter_callable_list)

@@ -63,6 +63,9 @@ class set(renpy.store.set):
     def add(self, value, **kwargs):
         return super().add(attribute(value, **kwargs))
 
+    def update(self, other, **kwargs):
+        return super().update(attribute(el, **kwargs) for el in other)
+
     def find(self, name=None, added=None):
         """
         Returns an element of the set satisfying the conditions given in arguments, or None.

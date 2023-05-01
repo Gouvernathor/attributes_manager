@@ -34,7 +34,7 @@ class attribute(str):
                 name = "-"+name
             elif added:
                 name = name.removeprefix("-")
-        return super(attribute, clss).__new__(clss, name)
+        return super().__new__(clss, name)
 
     @property
     def name(self):
@@ -50,6 +50,24 @@ class attribute(str):
         if added is True, the minus sign wasn't there.
         """
         return self[0] != '-'
+
+    def __pos__(self):
+        """
+        Forces the addedness to True and returns the result.
+        """
+        return attribute(self.name, True)
+
+    def __neg__(self):
+        """
+        Forces the addedness to False and returns the result.
+        """
+        return attribute(self.name, False)
+
+    def __invert__(self):
+        """
+        Inverts the addedness of the attribute and returns the result.
+        """
+        return attribute(self.name, not self.added)
 
     def __repr__(self):
         return "attribute({})".format(super().__repr__())
@@ -127,6 +145,24 @@ class set(renpy.store.set):
             if att.added == added:
                 rv.add(att)
         return rv
+
+    def __pos__(self):
+        """
+        Returns a copy of the set with all attributes' addedness forced to True.
+        """
+        return type(self)(+att for att in self)
+
+    def __neg__(self):
+        """
+        Returns a copy of the set with all attributes' addedness forced to False.
+        """
+        return type(self)(-att for att in self)
+
+    def __invert__(self):
+        """
+        Returns a copy of the set with all attributes' addedness inverted.
+        """
+        return type(self)(~att for att in self)
 
     def __repr__(self):
         return __name__ + "." + super().__repr__()

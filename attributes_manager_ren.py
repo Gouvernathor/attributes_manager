@@ -228,5 +228,5 @@ class __defaulter_callable_list(list):
             rv.update(func(aaa_set|rv))
         return name[0], *(str(el) for el in rv) # very important, only return native types !
 
-config.adjust_attributes = __defaultdict(__adjuster_callable_list)
-config.default_attribute_callbacks = __defaultdict(__defaulter_callable_list)
+config.adjust_attributes = __defaultdict(__adjuster_callable_list, config.adjust_attributes)
+config.default_attribute_callbacks = __defaultdict(__defaulter_callable_list, config.default_attribute_callbacks)

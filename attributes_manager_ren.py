@@ -138,7 +138,7 @@ class set(renpy.store.set):
 
     def filter_added(self, added):
         """
-        Returns a subset of each attribute with the given added-ness.
+        Returns a subset of each attribute with the given addedness.
         """
         rv = type(self)()
         for att in self:
@@ -181,6 +181,36 @@ for methname in ("__sub__", "__isub__", "__rsub__",
     setattr(set, methname, _wrapper(getattr(renpy.store.set, methname), set))
 del methname, _wrapper
 
+class adjuster_callable_list(list):
+    """
+    A list that can be called.
+
+    When called, it recursively calls every element of the list in order, and returns the last result.
+    This call is wrapped in the argument-wrapping this module does.
+
+    Intended mainly for internal use, use with caution and if you know what you're doing.
+    """
+
+    def __call__(self, name):
+        aaa_set = set(name[1:])
+        for func in self:
+            aaa_set = func(aaa_set)
+        return name[0], *(str(el) for el in aaa_set) # very important, only return native types !
+
+class defaulter_callable_list(list):
+    """
+    Same, but adapted to the default case.
+
+    Intended mainly for internal use, use with caution and if you know what you're doing.
+    """
+
+    def __call__(self, name):
+        aaa_set = set(name[1:])
+        rv = renpy.store.set()
+        for func in self:
+            rv.update(func(aaa_set|rv))
+        return name[0], *(str(el) for el in rv) # very important, only return native types !
+
 class adjust_decorator(python_object):
     """
     This is a decorator for the declaration of adjust_attributes functions.
@@ -205,6 +235,7 @@ class adjust_decorator(python_object):
     __slots__ = "name",
     suffix = "_adjust_attributes"
     store = renpy.store.config.adjust_attributes
+    cltype = adjuster_callable_list
 
     def __init__(self, name=None, /):
         if (name is None) or isinstance(name, str):
@@ -217,6 +248,8 @@ class adjust_decorator(python_object):
 
     def __call__(self, func):
         funcname = self.name or func.__name__.removesuffix(self.suffix)
+        if funcname not in self.store:
+            self.store[funcname] = self.cltype()
         self.store[funcname].append(func)
         return func
 
@@ -235,37 +268,12 @@ class default_decorator(adjust_decorator):
     __slots__ = ()
     suffix = "_default_attributes"
     store = renpy.store.config.default_attribute_callbacks
+    cltype = defaulter_callable_list
 
 """renpy
 init -999 python:
 """
-from collections import defaultdict as __defaultdict
-
-class __adjuster_callable_list(list):
-    """
-    A list that can be called.
-
-    When called, it recursively calls every element of the list in order, and returns the last result.
-    This call is wrapped in the argument-wrapping this module does.
-    """
-
-    def __call__(self, name):
-        aaa_set = attributes_manager.set(name[1:])
-        for func in self:
-            aaa_set = func(aaa_set)
-        return name[0], *(str(el) for el in aaa_set) # very important, only return native types !
-
-class __defaulter_callable_list(list):
-    """
-    Same, but adapted to the default case.
-    """
-
-    def __call__(self, name):
-        aaa_set = attributes_manager.set(name[1:])
-        rv = set()
-        for func in self:
-            rv.update(func(aaa_set|rv))
-        return name[0], *(str(el) for el in rv) # very important, only return native types !
-
-config.adjust_attributes = __defaultdict(__adjuster_callable_list, config.adjust_attributes)
-config.default_attribute_callbacks = __defaultdict(__defaulter_callable_list, config.default_attribute_callbacks)
+if False:
+    from collections import defaultdict as __defaultdict
+    config.adjust_attributes = __defaultdict(attributes_manager.adjuster_callable_list, config.adjust_attributes)
+    config.default_attribute_callbacks = __defaultdict(attributes_manager.defaulter_callable_list, config.default_attribute_callbacks)

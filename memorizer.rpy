@@ -18,11 +18,14 @@ init python:
         def default(self, attrs):
             return getattr(store, self.store_name)
 
+# practical example, with a layeredimage named cho whose attributes in the brows group are all listed here
 default cho_memorized = set()
-define cho_memorizer = memorizer("cho_memorized", "brows_angry", "brows_base", "brows_raised", "brows_worried")
 
-define config.adjust_attributes["cho"].append(cho_memorizer.adjust)
-define config.default_attribute_callbacks["cho"].append(cho_memorizer.default)
+init python hide:
+    cho_memorizer = memorizer("cho_memorized", "brows_angry", "brows_base", "brows_raised", "brows_worried")
+
+    config.adjust_attributes["cho"] = attributes_manager.adjuster_callable_list((cho_memorizer.adjust,))
+    config.default_attribute_callbacks["cho"] = attributes_manager.defaulter_callable_list((cho_memorizer.default,))
 
 # vanilla version
 # init python:

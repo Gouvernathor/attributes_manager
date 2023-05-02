@@ -270,10 +270,6 @@ class default_decorator(adjust_decorator):
     store = renpy.store.config.default_attribute_callbacks
     cltype = defaulter_callable_list
 
-"""renpy
-init -999 python:
-"""
-if False:
-    from collections import defaultdict as __defaultdict
-    config.adjust_attributes = __defaultdict(attributes_manager.adjuster_callable_list, config.adjust_attributes)
-    config.default_attribute_callbacks = __defaultdict(attributes_manager.defaulter_callable_list, config.default_attribute_callbacks)
+# from collections import defaultdict as __defaultdict
+# config.adjust_attributes = __defaultdict(attributes_manager.adjuster_callable_list, config.adjust_attributes)
+# config.default_attribute_callbacks = __defaultdict(attributes_manager.defaulter_callable_list, config.default_attribute_callbacks)

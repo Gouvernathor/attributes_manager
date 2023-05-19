@@ -113,7 +113,7 @@ class set(renpy.store.set):
         attributes_manager.set({"hell", "hello", "love", "bite"}).filter_or("hell", "lo")
             returns attributes_manager.set({"hell", "hello", "love"})
         """
-        rv = type(self)()
+        rv = set()
         for att in self:
             for substring in args:
                 if substring in str(att):
@@ -127,7 +127,7 @@ class set(renpy.store.set):
         attributes_manager.set({"hell", "hello", "love", "bite"}).filter_and("hell", "lo")
             returns attributes_manager.set({"hello"})
         """
-        rv = type(self)()
+        rv = set()
         for att in self:
             for substring in args:
                 if substring not in str(att):
@@ -140,7 +140,7 @@ class set(renpy.store.set):
         """
         Returns a subset of each attribute with the given addedness.
         """
-        rv = type(self)()
+        rv = set()
         for att in self:
             if att.added == added:
                 rv.add(att)
@@ -150,19 +150,19 @@ class set(renpy.store.set):
         """
         Returns a copy of the set with all attributes' addedness forced to True.
         """
-        return type(self)(+att for att in self)
+        return set(+att for att in self)
 
     def __neg__(self):
         """
         Returns a copy of the set with all attributes' addedness forced to False.
         """
-        return type(self)(-att for att in self)
+        return set(-att for att in self)
 
     def __invert__(self):
         """
         Returns a copy of the set with all attributes' addedness inverted.
         """
-        return type(self)(~att for att in self)
+        return set(~att for att in self)
 
     def __repr__(self):
         return __name__ + "." + super().__repr__()

@@ -250,9 +250,7 @@ class adjust_decorator(python_object):
 
     def __call__(self, func):
         funcname = self.name or func.__name__.removesuffix(self.suffix)
-        if funcname not in self.store:
-            self.store[funcname] = self.cltype()
-        self.store[funcname].append(func)
+        self.store.setdefault(funcname, self.cltype()).append(func)
         return func
 
 class default_decorator(adjust_decorator):

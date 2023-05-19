@@ -32,11 +32,10 @@ class attribute(str):
         if added is None:
             if name.__class__ is attribute:
                 return name
-        else:
-            if (not added) and (name[0] != "-"):
-                name = "-"+name
-            elif added:
-                name = name.removeprefix("-")
+        elif added:
+            name = name.removeprefix("-")
+        elif name[0] != "-":
+            name = "-"+name
         return super().__new__(clss, name)
 
     @property

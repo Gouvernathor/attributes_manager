@@ -29,7 +29,10 @@ class attribute(str):
     __slots__ = ()
 
     def __new__(clss, name, added=None):
-        if added is not None:
+        if added is None:
+            if name.__class__ is attribute:
+                return name
+        else:
             if (not added) and (name[0] != "-"):
                 name = "-"+name
             elif added:

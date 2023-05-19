@@ -240,13 +240,13 @@ class adjust_decorator(python_object):
     cltype = adjuster_callable_list
 
     def __init__(self, name=None, /):
-        if (name is None) or isinstance(name, str):
+        if (name is None) or isinstance(name, str) and name:
             self.name = name
         elif callable(name):
             self.name = None
             self(name)
         else:
-            raise TypeError("This must be used as a decorator directly, or called with no parameter, or called with a string.")
+            raise TypeError("This must be used as a decorator directly, or called with no parameter, or called with a non-empty string.")
 
     def __call__(self, func):
         funcname = self.name or func.__name__.removesuffix(self.suffix)
